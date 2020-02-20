@@ -1,9 +1,9 @@
-# RST EDU Segmentor #
+# RST EDU Segmenter #
 
 This is the reimplement code[BERT + BiLSTM + CRF] for the paper:
 [ToNy: Contextual embeddings for accurate multilingual discourse segmentation of full documents](https://www.aclweb.org/anthology/W19-2715.pdf)
 
-We use CRF in our segmentor, and the original paper without CRF.
+We use CRF in our segmenter, and the original paper without CRF.
 
 ## Environment ##
 
