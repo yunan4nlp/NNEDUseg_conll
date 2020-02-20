@@ -1,0 +1,51 @@
+[Data]
+eval_scripts = scripts/seg_eval.py
+bert_dir = ../bert-base-uncased-model
+data_dir = rst_conll
+train_file = %(data_dir)s/eng.rst.rstdt_train.conll.filled
+dev_file = %(data_dir)s/eng.rst.rstdt_dev.conll.filled
+test_file = %(data_dir)s/eng.rst.rstdt_test.conll.filled
+min_occur_count = 0
+
+[Save]
+save_dir = rst_eduseg_model
+config_file = %(save_dir)s/config.cfg
+save_model_path = %(save_dir)s/model
+save_vocab_path = %(save_dir)s/vocab
+load_dir = rst_eduseg_model
+load_model_path = %(load_dir)s/model
+load_vocab_path = %(load_dir)s/vocab
+
+[Network]
+cnn_window = 5
+lstm_layers = 1
+word_dims = 100
+dropout_emb = 0.33
+lstm_hiddens = 100
+dropout_lstm_input = 0.33
+dropout_lstm_hidden = 0.33
+dropout_mlp = 0.33
+hidden_size = 100
+output_hidden_states = True
+output_attentions = False
+start_layer = 0
+end_layer = 13
+
+[Optimizer]
+l2_reg = 1e-6
+learning_rate = 2e-3
+decay = .75
+decay_steps = 1000
+beta_1 = .9
+beta_2 = .9
+epsilon = 1e-12
+clip = 5.0
+
+[Run]
+train_iters = 10
+train_batch_size = 128
+test_batch_size = 10
+validate_every = 50000
+save_after = 5
+update_every = 1
+
