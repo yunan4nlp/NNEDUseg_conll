@@ -13,7 +13,6 @@ from modules.WordLSTM import *
 from modules.PretrainedWordEncoder import *
 from modules.Decoder import *
 from modules.EDUSegmenter import *
-from allennlp.modules.conditional_random_field import ConditionalRandomField as CRF
 import time
 
 class Optimizer:
@@ -44,7 +43,6 @@ def train(train_data, dev_data, test_data, segmenter, vocab, config, tokenizer):
                              segmenter.pwordEnc.parameters(),
                              segmenter.wordLSTM.parameters(),
                              segmenter.dec.parameters(),
-                             segmenter.crf.parameters()
                          )
                          )
 
@@ -115,7 +113,6 @@ def train(train_data, dev_data, test_data, segmenter, vocab, config, tokenizer):
                             "pwordEnc": segmenter.pwordEnc.state_dict(),
                             "wordLSTM": segmenter.wordLSTM.state_dict(),
                             "dec": segmenter.dec.state_dict(),
-                            "crf": segmenter.crf.state_dict()
                             }
                         torch.save(segmenter_model, config.save_model_path + "." + str(global_step))
                         print('Saving model to ', config.save_model_path + "." + str(global_step))
@@ -244,16 +241,12 @@ if __name__ == '__main__':
     pwordEnc = PretrainedWordEncoder(config, enc_model, enc_model.bert_hidden_size, enc_model.layer_num)
     wordLSTM = WordLSTM(vocab, config)
     dec = Decoder(vocab, config)
-    crf = CRF(num_tags=vocab.seglabel_size,
-              constraints=None,
-              include_start_end_transitions=False)
     pickle.dump(vocab, open(config.save_vocab_path, 'wb'))
 
     if config.use_cuda:
         wordLSTM.cuda()
         pwordEnc.cuda()
         dec.cuda()
-        crf.cuda()
 
-    segmenter = EDUSegmenter(pwordEnc, wordLSTM, dec, crf, config)
+    segmenter = EDUSegmenter(pwordEnc, wordLSTM, dec, config)
     train(train_data, dev_data, test_data, segmenter, vocab, config, tok)

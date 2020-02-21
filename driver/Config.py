@@ -67,10 +67,6 @@ class Configurable(object):
     def load_vocab_path(self):
         return self._config.get('Save', 'load_vocab_path')
 
-
-    @property
-    def cnn_window(self):
-        return self._config.getint('Network','cnn_window')
     @property
     def lstm_layers(self):
         return self._config.getint('Network','lstm_layers')

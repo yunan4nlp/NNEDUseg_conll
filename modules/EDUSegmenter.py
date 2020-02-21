@@ -2,26 +2,23 @@ import torch.nn.functional as F
 from modules.Layer import *
 
 class EDUSegmenter(object):
-    def __init__(self, pwordEnc, wordLSTM, dec, crf, config):
+    def __init__(self, pwordEnc, wordLSTM, dec, config):
         self.config = config
         self.pwordEnc = pwordEnc
         self.wordLSTM = wordLSTM
         self.dec = dec
-        self.crf = crf
         self.use_cuda = next(filter(lambda p: p.requires_grad, wordLSTM.parameters())).is_cuda
 
     def train(self):
         self.pwordEnc.train()
         self.wordLSTM.train()
         self.dec.train()
-        self.crf.train()
         self.training = True
 
     def eval(self):
         self.pwordEnc.eval()
         self.wordLSTM.eval()
         self.dec.eval()
-        self.crf.eval()
         self.training = False
 
     def encode(self, bert_indice_input, bert_segments_ids, bert_piece_ids, bert_mask, word_mask):
@@ -37,13 +34,15 @@ class EDUSegmenter(object):
         self.encoder_output = self.wordLSTM(sent_extword_embed, word_mask)
 
     def decode(self, label_mask):
-        if self.use_cuda:
-            label_mask = label_mask.cuda()
+        #if self.use_cuda:
+            #label_mask = label_mask.cuda()
         self.decoder_output = self.dec(self.encoder_output)
 
-        output = self.crf.viterbi_tags(self.decoder_output, label_mask)
+        output = self.decoder_output.detach().max(2)[1].cpu().numpy()
+        lengths = label_mask.numpy().sum(1)
         best_paths = []
-        for path, score in output:
+        for idx, seq_length in enumerate(lengths):
+            path = list(output[idx][:seq_length])
             best_paths.append(path)
         return best_paths
 
@@ -68,8 +67,12 @@ class EDUSegmenter(object):
         true_segs = _model_var(
             self.wordLSTM,
             pad_sequence(true_segs, length=sent_len, padding=0, dtype=np.int64))
-        crf_loss = -self.crf(self.decoder_output, true_segs, label_mask) / batch_size
-        return crf_loss
+
+        loss = F.cross_entropy(input=self.decoder_output.view(-1, label_size),
+                        target=true_segs.view(-1),
+                        ignore_index=-1)
+
+        return loss
 
 def _model_var(model, x):
     p = next(filter(lambda p: p.requires_grad, model.parameters()))
