@@ -1,18 +1,18 @@
 # RST EDU Segmenter #
 
-This is the reimplement code[BERT + BiLSTM] for the paper:
+This is the reimplement code[BERT + BiLSTM] for the paper:</br>
 [ToNy: Contextual embeddings for accurate multilingual discourse segmentation of full documents](https://www.aclweb.org/anthology/W19-2715.pdf)
 
 
 ## Environment ##
 
 
-Pytorch 1.0.0:
+Pytorch 1.0.0:</br>
 *https://download.pytorch.org/whl/cpu/torch_stable.html*
 
 ## Data ##
 
-DISRPT2019 Shared Task</br>
+DISRPT2019 Shared Task: </br>
 *https://github.com/disrpt/sharedtask2019*
 
 We only prepare the RST Tree Bank.</br>
